@@ -1,0 +1,6 @@
+--- Extraction Pipeline Statistics ---
+Total .eaf files processed:       2792
+Distinct vocabulary items saved:  4252
+Duplicate glosses skipped:        24570
+Failed pairs (missing video):     8
+--------------------------------------

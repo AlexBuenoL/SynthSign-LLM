@@ -15,7 +15,8 @@ class SignPoseStorage:
 
     def _ensure_core_buckets(self):
         """Validates that the essential buckets exist, creating them if necessary."""
-        required_buckets = ["vocabulary-poses", "stitched-sequences"]
+        #required_buckets = ["raw-data", "vocabulary-videos", "vocabulary-poses", "stitched-sequences"]
+        required_buckets = ["raw-data"]
         for bucket in required_buckets:
             if not self.client.bucket_exists(bucket):
                 self.client.make_bucket(bucket)
@@ -51,21 +52,33 @@ class SignPoseStorage:
             response = self.client.get_object(bucket_name, object_name)
             buffer = io.BytesIO(response.read())
             return np.load(buffer)
-            
         except S3Error as err:
             print(f"MinIO Retrieval Error on {object_name}: {err}")
             return np.array([])
-            
         finally:
             if response:
                 response.close()
                 response.release_conn()
 
-    def list_poses(self, bucket_name: str, prefix: str = "") -> list:
-        """Returns a list of object names within a specific bucket."""
+    def list_objects(self, bucket_name: str, suffix: str = "") -> list:
+        """Returns a list of object names within a specific bucket, filtered by suffix."""
         try:
-            objects = self.client.list_objects(bucket_name, prefix=prefix, recursive=True)
-            return [obj.object_name for obj in objects]
+            objects = self.client.list_objects(bucket_name, recursive=True)
+            return [obj.object_name for obj in objects if obj.object_name.endswith(suffix)]
         except S3Error as err:
             print(f"MinIO List Error: {err}")
             return []
+
+    def download_file(self, bucket_name: str, object_name: str, local_path: str):
+        """Downloads a file directly to the local file system."""
+        try:
+            self.client.fget_object(bucket_name, object_name, local_path)
+        except S3Error as err:
+            print(f"MinIO Download Error on {object_name}: {err}")
+
+    def upload_file(self, bucket_name: str, object_name: str, local_path: str):
+        """Uploads a file directly from the local file system."""
+        try:
+            self.client.fput_object(bucket_name, object_name, local_path)
+        except S3Error as err:
+            print(f"MinIO File Upload Error on {object_name}: {err}")
