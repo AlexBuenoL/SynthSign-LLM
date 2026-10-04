@@ -1,0 +1,18 @@
+# Core ML and NLP dependencies for Qwen LLM projection
+transformers 
+accelerate 
+peft 
+bitsandbytes 
+datasets 
+sentencepiece 
+wandb
+
+# Computer Vision and Signal Processing dependencies for Pose Stitching
+mediapipe 
+opencv-python-headless 
+scipy 
+numpy 
+pandas 
+minio 
+jupyterlab 
+matplotlib
